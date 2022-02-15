@@ -1,0 +1,22 @@
+version: '3'
+
+services:
+  db:
+    image: postgres
+    restart: always
+    container_name: postgres_db_university
+    environment:
+      POSTGRES_DB: person
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+
+  app:
+    build: ./
+    container_name: university-app
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+

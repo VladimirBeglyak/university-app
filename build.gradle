@@ -1,0 +1,49 @@
+plugins {
+    id 'org.springframework.boot' version '2.6.3'
+    id 'io.spring.dependency-management' version '1.0.11.RELEASE'
+    id 'io.freefair.lombok' version '6.3.0'
+    id 'java'
+}
+
+group = 'com.begliak'
+version = '0.0.1-SNAPSHOT'
+
+java{
+    sourceCompatibility = JavaVersion.VERSION_16
+    targetCompatibility = JavaVersion.VERSION_16
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+
+    runtimeOnly 'org.postgresql:postgresql'
+    implementation 'org.flywaydb:flyway-core:8.4.4'
+
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+}
+
+jar{
+
+    def jars = configurations.runtimeClasspath.files.collect {"lib/$it.name"}
+
+    manifest {
+        attributes 'Main-Class':'com.begliak.UniversityAppApplication',
+                'Class-Path': jars.join(' ')
+    }
+
+    task copyAllDependencies(type: Copy){
+        from(configurations.runtimeClasspath.files)
+        into("$buildDir/libs/lib")
+    }
+}
+
+jar.dependsOn copyAllDependencies
+
+tasks.named('test') {
+    useJUnitPlatform()
+}
